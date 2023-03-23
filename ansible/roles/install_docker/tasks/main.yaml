@@ -1,0 +1,6 @@
+- name: install update
+  become: true
+  apt:
+    update_cache: yes
+- name: install Docker
+  shell: 'sudo curl -sSL https://get.docker.com/ | sudo sh'

@@ -1,0 +1,55 @@
+- name: download node exporter
+  get_url:
+    url: https://github.com/prometheus/node_exporter/releases/download/v1.5.0/node_exporter-1.5.0.linux-amd64.tar.gz
+    dest: /opt
+
+- name: unarchive node exporter
+  unarchive:
+    remote_src: yes
+    src: /opt/node_exporter-1.5.0.linux-amd64.tar.gz
+    dest: /opt
+
+- name: Ensure group 'node_exporter' exists
+  ansible.builtin.group:
+    name: node_exporter
+    # state: absent
+
+- name: Add node_exporter to node_exporter
+  ansible.builtin.user:
+    name: node_exporter
+    create_home: false
+    shell: /bin/false
+    group: node_exporter
+    # state: absent
+
+- name: Create node_exporter directory if it does not exist
+  ansible.builtin.file:
+    path: /etc/node_exporter
+    state: directory
+    owner: node_exporter
+    group: node_exporter
+    mode: '0755'
+
+- name: move node exporter to /usr/local/bin
+  copy:
+    src: /opt/node_exporter-1.5.0.linux-amd64/node_exporter
+    dest: /usr/bin/node_exporter
+    remote_src: yes
+    owner: node_exporter
+    group: node_exporter
+    mode: 0755
+
+- name: install unit file to systemd
+  template:
+    src: node_exporter.service.j2
+    dest: /usr/lib/systemd/system/node_exporter.service
+    owner: node_exporter
+    group: node_exporter
+    mode: 0600
+
+- name: configure systemd to use service
+  systemd:
+    daemon_reload: yes
+    enabled: yes
+    state: started
+    name: node_exporter.service

@@ -1,0 +1,18 @@
+- name: Stop running containers
+  docker_container:
+    name: "{{ default_container_name }}"
+    state: absent
+
+- name: clean
+  shell:
+    "docker system prune -af"
+
+- name: ensure a container is running
+  docker_container:
+    name: "{{ default_container_name }}"
+    state: started
+    image: "{{ default_container_image }}"
+    detach: true
+    pull: true
+    ports:
+      - "80:5000"

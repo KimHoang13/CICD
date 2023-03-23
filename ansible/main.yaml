@@ -1,0 +1,10 @@
+- hosts: "{{ host }}"
+  become: true
+  vars:
+    default_container_name: webapp
+    default_container_image: kimhh13/lab:44
+    install_nodeexp: false
+  roles:
+  - install_docker
+  - run_container
+  - { role: roles/install_nodeexporter,  when: "install_nodeexp | bool" }
